@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%= userDetail %></title>
+</head>
+<body>
+       
+                    <div>
+                        <h1>UserId: <%=user.id %>
+                        <h1>name: <%=user.name %></h1>
+                        <h1>email: <%=user.email %></h1>
+                        <h1>password: <%=user.password %></h1>
+                        <h1>confirmPassword: <%=user.confirmPassword %></h1>
+                        <br>
+                        <form action = "/edit-user/<%= user.id %>" method = 'post'>
+                            <input type = 'submit' value = 'Edit'></input>
+                        </form><br>
+                        <form action = "/delete-user/<%= user.id %>" method = 'post'>
+                            <input type = 'submit' value = 'delete'></input>
+                        </form>
+                        <a href = '/'>Go Back</a>
+
+                       
+                    </div>
+</body>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>UserForm</title>
+</head>
+<body>  
+        <div>
+                <a href='/userForm'>addUser</a>
+                
+        </div>
+      
+        <% if(users.length > 0) { %> 
+            <div>
+                <% for (let user of users) { %>
+                    <div>
+                        <h1>name: <%=user.name %></h1>
+                        <h1>email: <%=user.email %></h1>
+                        <h1>password: <%=user.password %></h1>
+                        <h1>confirmPassword: <%=user.confirmPassword %></h1>
+                        <a href="/user-detail/<%= user.id %>">UserDetails</a>
+                        <br>
+                       
+                    </div>
+                <% } %>
+
+                
+
+             </div>
+        <% } else { %>
+            <h1>No User fOUND</h1>
+        <% } %>
+
+        
+       
+        
+
+        </body>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Edit User</title>
+    <h1>update user details</h1>
+</head>
+<body>
+    
+
+    <form action = '/edit-user' method = 'post'>
+
+        <% if (isTrue === false){ %>
+            
+                    Name:  <input type = 'text' name = 'name' value = "<% if (isNameValid){ %><%= user.name%><% } %>" > <% if (isNameValid === false){ %>name field is empty<% } %> <br><br>
+                    Email:  <input type = 'email', name = 'email' value = "<% if (isEmail){ %><%= user.email%><% } %>" required><br><br>
+                    password: <input type = 'password', name = 'password' value = "<% if (isPassValid){ %><%= user.password%><% } %>"><% if (passwordStrength === false){ %>password must contain 8 letters<% } %><br><br>
+                    confirm Password: <input type = 'password', name = 'confirmPassword' value = "<% if (ispassMatched){ %><%= user.confirmPassword%><% } %>"> <% if (ispassMatched === false){ %>password is different<% } %><br><br>
+            
+        <%}else {%>
+     
+                    Name:  <input type = 'text' value = "<%= user.name %>" name = 'name'><br><br>
+                    Email:  <input type = 'email' value = "<%= user.email %>"  name = 'email' ><br><br>
+                    password: <input type = 'password' value = "<%= user.password %>"  name = 'password' ><br><br>
+                    confirm Passowrd: <input type = 'password'  value = "<%= user.confirmPassword %>" name = 'confirmPassword' ><br><br>
+        <% } %>
+
+                    <input type="hidden" value="<%= user.id %>" name="userId">
+                    <input type = 'submit' value = 'Update'></input>
+    </form>
+    
+</body>
+</html>
