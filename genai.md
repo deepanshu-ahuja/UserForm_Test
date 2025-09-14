@@ -456,7 +456,7 @@ OPENAI_API_KEY=sk-your-api-key
 
 ---
 
-## 2. Express Server (server.js)
+
 ```js
 import express from "express";
 import OpenAI from "openai";
@@ -591,6 +591,7 @@ We’ll cover:
 ⸻
 
 🗄️ Database Setup (Postgres + pgvector)
+```bash
 
 If you installed Postgres locally (without Docker), run:
 
@@ -616,7 +617,9 @@ docker run -d \
   ankane/pgvector
 
 Then run the same SQL setup inside.
+```
 
+```js
 // Import dependencies
 import express from "express";
 import OpenAI from "openai";   // OpenAI client SDK
@@ -707,7 +710,9 @@ Answer:
 app.listen(3000, () =>
   console.log("RAG server running at http://localhost:3000")
 );
+```
 
+```js
 import { useState } from "react";
 
 export default function RAGChat() {
@@ -758,6 +763,8 @@ function App() {
 }
 
 export default App;
+```
+```bash
 Workflow
 	1.	Start backend:
 node server.js
@@ -777,7 +784,9 @@ Start React frontend:
 	•	“Where do I enable 2FA?”
 
 LLM will answer using the retrieved docs from Postgres instead of hallucinating.
+```
 
+```js
 ⸻
 
 	•	A database-backed vector search (pgvector).
@@ -1135,6 +1144,9 @@ export default App;
 // 4. Open http://localhost:3000 in browser.
 //    Type: "How do I change my login password?"
 //    → Answer grounded in Postgres docs
+
+```
+```js
 // =============================================
 // FULL MERN RAG EXAMPLE (ONE FILE VERSION)
 // =============================================
@@ -1431,6 +1443,9 @@ export default FrontendApp;
 //    - Upload a PDF (click Upload PDF)
 //    - Ask questions → chatbot answers based on PDF
 //
+```
+
+```js
 // =============================================
 // FULL MERN RAG — ONE FILE (with multi-PDF support)
 // =============================================
@@ -1833,49 +1848,61 @@ export default FrontendApp;
 //   3) Ask questions — answers cite [docId#chunkId]
 //
 // =============================================
+```
 
-What LangChain gives you (beyond our hand-written Express code):
-	•	Retrievers & Chains: Pluggable components for RAG (splitters, embedders, vector stores, LLM calls).
-	•	Pipelines: Compose steps like “split → embed → store → retrieve → prompt → generate” cleanly.
-	•	Tools & Agents: Later, you can add tool-calling, web browsing, code execution, etc.
-	•	Evals & Tracing: Better observability while prototyping.
+## What LangChain Gives You (Beyond Hand-Written Express Code)
 
-When to use it:
-	•	Your code starts to grow: multiple retrievers, re-usable chains, different prompts per route.
-	•	You want to swap storage (pgvector ↔ Pinecone) or embedders with minimal changes.
-	•	You plan to add Agentic behaviors later.
+- **Retrievers & Chains:** Pluggable components for RAG (splitters, embedders, vector stores, LLM calls).
+- **Pipelines:** Compose steps like “split → embed → store → retrieve → prompt → generate” cleanly.
+- **Tools & Agents:** Add tool-calling, web browsing, code execution, etc.
+- **Evals & Tracing:** Better observability while prototyping.
 
-When not to:
-	•	Tiny demos like our minimal Express server are simpler to write by hand.
+---
 
-Right now, our backend works like this:
-	1.	User uploads a PDF → we parse, chunk, embed → save in Postgres.
-	2.	User asks a question → we embed, search Postgres, retrieve chunks.
-	3.	We build a prompt manually, send to OpenAI, return answer.
+## When to Use LangChain
 
-This is great for a demo, but imagine:
-	•	Tomorrow you want to switch Postgres → Pinecone.
-	•	Or switch OpenAI → Anthropic.
-	•	Or add features like “summarize 10 docs” or “chain multiple prompts.”
+- Your code starts to grow: multiple retrievers, reusable chains, different prompts per route.
+- You want to swap storage (pgvector ↔ Pinecone) or embedders with minimal changes.
+- You plan to add Agentic behaviors later.
 
-If you write everything manually, you’ll repeat code & it gets messy.
+---
 
-LangChain solves this by giving you abstractions:
-	•	TextSplitters → instead of writing chunkText, you use RecursiveCharacterTextSplitter.
-	•	VectorStores → instead of writing SQL manually, you call PGVector or PineconeVectorStore.
-	•	Retrievers → wrap vector store + query logic.
-	•	Chains → combine retriever + LLM into a neat pipeline.
-	•	Agents → add reasoning & tool use (later).
+## When Not to Use LangChain
 
-Think of LangChain as:
-	•	React for LLM apps.
-	•	React gives you <Component>s like Button, Card, List so you don’t re-code UI basics.
-	•	LangChain gives you VectorStore, Retriever, Chain so you don’t re-code AI plumbing.
+- For tiny demos (like our minimal Express server), manual code is simpler and faster.
 
-Instead of hardcoding everything (like we did in Express), you compose blocks.
+---
 
-Below is a conceptual rewrite of our backend logic using LangChain. Don’t copy yet — just read and understand.
+## Why LangChain?
 
+**Current backend flow:**
+1. User uploads a PDF → parse, chunk, embed → save in Postgres.
+2. User asks a question → embed, search Postgres, retrieve chunks.
+3. Build a prompt manually, send to OpenAI, return the answer.
+
+This works for demos, but as your app grows:
+- Switching Postgres to Pinecone or OpenAI to Anthropic means rewriting code.
+- Adding features (summarize multiple docs, chain prompts) gets messy.
+
+LangChain provides abstractions:
+- **TextSplitters:** Use `RecursiveCharacterTextSplitter` instead of writing chunking logic.
+- **VectorStores:** Use `PGVectorStore` or `PineconeVectorStore` instead of manual SQL.
+- **Retrievers:** Wrap vector store and query logic.
+- **Chains:** Combine retriever and LLM into a pipeline.
+- **Agents:** Add reasoning and tool use (covered later).
+
+**Analogy:**  
+LangChain is like React for LLM apps:
+- React gives you `<Component>`s (Button, Card, List) so you don’t re-code UI basics.
+- LangChain gives you VectorStore, Retriever, Chain so you don’t re-code AI plumbing.
+
+Instead of hardcoding everything, you compose reusable blocks.
+
+---
+
+## Conceptual Rewrite Using LangChain
+
+```js
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { ChatOpenAI } from "@langchain/openai";
@@ -1898,79 +1925,55 @@ const llm = new ChatOpenAI({
   temperature: 0,
 });
 
-// 4. Chain (retriever + LLM in one)
+// 4. Chain (retriever + LLM)
 const chain = RetrievalQAChain.fromLLM(llm, store.asRetriever(3));
 
 // 5. Ask question
 const result = await chain.call({ query: "How do I reset my password?" });
 console.log(result.text);
-	•	Before:
-	•	We wrote chunkText, embed(), SQL queries, prompt string manually.
-	•	Now (LangChain):
-	•	TextSplitter → automatic chunking.
-	•	PGVectorStore → automatic embedding + saving to DB.
-	•	Retriever → automatic similarity search.
-	•	Chain → automatic prompt construction + LLM call.
-	•	You now see why LangChain exists: to make RAG pipelines composable and maintainable.
-	•	Our manual Express backend taught you the plumbing → now LangChain shows the framework way.
-	•	You should always learn manual first (which we did) so LangChain isn’t a black box.
-	•	Split text with LangChain’s RecursiveCharacterTextSplitter.
-	•	Store embeddings in pgvector via LangChain.
-	•	Build a RetrievalQAChain.
-	•	Expose /ask endpoint.
+```
+
+**Summary:**
+- Manual: You write chunking, embedding, SQL, and prompt logic.
+- LangChain: Handles chunking, embedding, storage, retrieval, and prompt construction for you.
+
+**Takeaway:**  
+LangChain makes RAG pipelines composable and maintainable.  
+Learn manual first (for understanding), then use LangChain for scalable apps.
+
+---
+
+## LangChain RAG Backend Examples
+
+Below are two practical backend examples using LangChain with Postgres (pgvector):
+
+---
+
+### 1. Text Ingestion & Q&A (No PDF)
+
+This backend lets you POST raw text, splits it into semantic chunks, embeds, stores in pgvector, and answers questions using RetrievalQAChain.
+
+```js
 // LangChain RAG Backend with Postgres (pgvector)
 // =============================================
 //
-// This file demonstrates:
-// - Using LangChain abstractions instead of manual code
-// - Text splitting with RecursiveCharacterTextSplitter
-// - Embedding + storing in pgvector via LangChain
-// - Building a RetrievalQAChain (retriever + LLM)
-// - Exposing /upload-text and /ask endpoints with Express
-//
-// ---------------------------------------------
-// 📦 Dependencies
-// ---------------------------------------------
 // npm install express dotenv pg
 // npm install @langchain/openai @langchain/community langchain
 //
-// .env
-// OPENAI_API_KEY=sk-...
-//
-// ---------------------------------------------
-// 🗄️ Database Setup (Postgres with pgvector)
-// ---------------------------------------------
-// CREATE DATABASE rag_demo;
-// \c rag_demo
-// CREATE EXTENSION IF NOT EXISTS vector;
-// CREATE TABLE documents (
-//   id SERIAL PRIMARY KEY,
-//   content TEXT,
-//   embedding VECTOR(1536)
-// );
-//
-// =============================================
+// .env: OPENAI_API_KEY=sk-...
 
 import express from "express";
 import "dotenv/config";
 import pkg from "pg";
-
 import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { RetrievalQAChain } from "langchain/chains";
 
 const { Pool } = pkg;
-
-// ---------------------------------------------
-// Express setup
-// ---------------------------------------------
 const app = express();
 app.use(express.json());
 
-// ---------------------------------------------
-// Postgres pool (pg)
-// ---------------------------------------------
 const pool = new Pool({
   user: "postgres",
   host: "localhost",
@@ -1979,16 +1982,10 @@ const pool = new Pool({
   port: 5432,
 });
 
-// ---------------------------------------------
-// LangChain: Embeddings & Vector Store
-// ---------------------------------------------
-const embeddings = new OpenAIEmbeddings({
-  model: "text-embedding-3-small", // 1536 dims, cost-effective
-});
-
+const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
 const store = await PGVectorStore.initialize(embeddings, {
-  pool,                        // Postgres connection
-  tableName: "documents",      // our table
+  pool,
+  tableName: "documents",
   columns: {
     idColumnName: "id",
     contentColumnName: "content",
@@ -1996,130 +1993,148 @@ const store = await PGVectorStore.initialize(embeddings, {
   },
 });
 
-// ---------------------------------------------
-// LangChain: LLM + RetrievalQAChain
-// ---------------------------------------------
-const llm = new ChatOpenAI({
-  model: "gpt-4o-mini",
-  temperature: 0,
-});
+const llm = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
+const retriever = store.asRetriever(3);
+const chain = RetrievalQAChain.fromLLM(llm, retriever, { returnSourceDocuments: true });
 
-// Retriever: wrap vector search
-const retriever = store.asRetriever(3); // top-3 matches
+const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 400, chunkOverlap: 50 });
 
-// Chain: retrieval + LLM
-const chain = RetrievalQAChain.fromLLM(llm, retriever, {
-  returnSourceDocuments: true,
-});
-
-// ---------------------------------------------
-// Helper: split text into chunks
-// RecursiveCharacterTextSplitter is smarter than our
-// manual chunkText (keeps semantic boundaries).
-// ---------------------------------------------
-const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 400,    // ~400 chars
-  chunkOverlap: 50,  // overlap to preserve context
-});
-
-// ---------------------------------------------
-// Endpoint: /upload-text
-// Accepts { text: "..." }, splits, embeds, saves
-// ---------------------------------------------
 app.post("/upload-text", async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: "No text provided" });
-
-  const docs = await splitter.createDocuments([text]); // chunks
+  const docs = await splitter.createDocuments([text]);
   await store.addDocuments(docs);
-
   res.json({ message: "Text indexed", chunks: docs.length });
 });
 
-// ---------------------------------------------
-// Endpoint: /ask
-// Accepts { question: "..." }, retrieves + answers
-// ---------------------------------------------
 app.post("/ask", async (req, res) => {
   const { question } = req.body;
   if (!question) return res.status(400).json({ error: "Missing question" });
-
   const result = await chain.call({ query: question });
-
   res.json({
     answer: result.text,
     sources: result.sourceDocuments.map(d => d.pageContent),
   });
 });
 
-// ---------------------------------------------
-// Start server
-// ---------------------------------------------
 app.listen(3000, () => {
   console.log("LangChain RAG backend running on http://localhost:3000");
 });
+```
 
-// =============================================
-// =============================================
-//
-// 1. Start backend:
-//    node server.js
-//
-// 2. Upload text (simulating PDF ingestion):
-//    curl -X POST http://localhost:3000/upload-text \
-//      -H "Content-Type: application/json" \
-//      -d '{"text":"To reset your password, go to Settings > Security > Reset Password."}'
-//
-// 3. Ask a question:
-//    curl -X POST http://localhost:3000/ask \
-//      -H "Content-Type: application/json" \
-//      -d '{"question":"How do I reset my password?"}'
-//
-// Response: Answer + source chunks
-// =============================================
-	•	How our manual Express code maps to LangChain components:
-	•	chunkText → RecursiveCharacterTextSplitter
-	•	embed() + SQL → OpenAIEmbeddings + PGVectorStore
-	•	Prompt + LLM call → RetrievalQAChain
-	•	Why this is cleaner: everything is reusable, swappable, and standardized
+**How it maps:**
+- Manual chunkText → `RecursiveCharacterTextSplitter`
+- Manual embed + SQL → `OpenAIEmbeddings` + `PGVectorStore`
+- Manual prompt + LLM → `RetrievalQAChain`
+- Cleaner, reusable, and swappable components.
+
+---
+
+### 2. PDF Ingestion & Q&A
+
+This backend lets you upload a PDF, splits/extracts text, embeds, stores in pgvector, and answers questions over the PDF.
+
+```js
 // LangChain RAG Backend with PDF Ingestion
 // =============================================
 //
-// This file demonstrates:
-// - Loading a PDF into LangChain documents
-// - Splitting text with RecursiveCharacterTextSplitter
-// - Embedding + storing in pgvector
-// - RetrievalQAChain for Q&A over PDF
-// - Express endpoints for upload + ask
-//
-// ---------------------------------------------
-// 📦 Dependencies
-// ---------------------------------------------
 // npm install express dotenv pg
 // npm install @langchain/openai @langchain/community langchain
 // npm install pdf-parse express-fileupload
 //
-// .env
-// OPENAI_API_KEY=sk-...
-//
-// ---------------------------------------------
-// 🗄️ Database Setup (Postgres with pgvector)
-// ---------------------------------------------
-// CREATE DATABASE rag_demo;
-// \c rag_demo
-// CREATE EXTENSION IF NOT EXISTS vector;
-// CREATE TABLE documents (
-//   id SERIAL PRIMARY KEY,
-//   doc_id TEXT,
-//   content TEXT,
-//   embedding VECTOR(1536)
-// );
-//
-// =============================================
+// .env: OPENAI_API_KEY=sk-...
 
 import express from "express";
-import fileUpload from "express-fileupload";   // handle PDF uploads
-import pdfParse from "pdf-parse";              // extract text from PDFs
+import fileUpload from "express-fileupload";
+import pdfParse from "pdf-parse";
+import "dotenv/config";
+import pkg from "pg";
+import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
+import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import { RetrievalQAChain } from "langchain/chains";
+
+const { Pool } = pkg;
+const app = express();
+app.use(express.json());
+app.use(fileUpload());
+
+const pool = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "rag_demo",
+  password: "postgres",
+  port: 5432,
+});
+
+const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
+const store = await PGVectorStore.initialize(embeddings, {
+  pool,
+  tableName: "documents",
+  columns: {
+    idColumnName: "id",
+    contentColumnName: "content",
+    vectorColumnName: "embedding",
+  },
+});
+
+const llm = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
+const retriever = store.asRetriever(3);
+const chain = RetrievalQAChain.fromLLM(llm, retriever, { returnSourceDocuments: true });
+const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 400, chunkOverlap: 50 });
+
+app.post("/upload-pdf", async (req, res) => {
+  if (!req.files || !req.files.pdf) return res.status(400).json({ error: "No PDF uploaded" });
+  const pdfFile = req.files.pdf;
+  const parsed = await pdfParse(pdfFile.data);
+  const docs = await splitter.createDocuments([parsed.text]);
+  await store.addDocuments(docs);
+  res.json({ message: "PDF indexed", chunks: docs.length });
+});
+
+app.post("/ask", async (req, res) => {
+  const { question } = req.body;
+  if (!question) return res.status(400).json({ error: "Missing question" });
+  const result = await chain.call({ query: question });
+  res.json({
+    answer: result.text,
+    sources: result.sourceDocuments.map(d => d.pageContent),
+  });
+});
+
+app.listen(3000, () => {
+  console.log("LangChain RAG backend with PDF running on http://localhost:3000");
+});
+```
+
+**Summary:**
+- Use LangChain abstractions for chunking, embedding, storage, retrieval, and Q&A.
+- Easily swap components (e.g., Pinecone instead of pgvector).
+- Standardized, maintainable, and production-ready code.
+
+---
+## 🗄️ Database Setup (Postgres with pgvector)
+
+```sql
+CREATE DATABASE rag_demo;
+\c rag_demo
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE TABLE documents (
+  id SERIAL PRIMARY KEY,
+  doc_id TEXT,
+  content TEXT,
+  embedding VECTOR(1536)
+);
+```
+
+---
+
+## 🚀 LangChain RAG Backend (Express + pgvector + PDF)
+
+```js
+import express from "express";
+import fileUpload from "express-fileupload";   // PDF uploads
+import pdfParse from "pdf-parse";              // PDF text extraction
 import "dotenv/config";
 import pkg from "pg";
 
@@ -2130,16 +2145,10 @@ import { RetrievalQAChain } from "langchain/chains";
 
 const { Pool } = pkg;
 
-// ---------------------------------------------
-// Express setup
-// ---------------------------------------------
 const app = express();
 app.use(express.json());
 app.use(fileUpload());
 
-// ---------------------------------------------
-// Postgres connection
-// ---------------------------------------------
 const pool = new Pool({
   user: "postgres",
   host: "localhost",
@@ -2148,12 +2157,7 @@ const pool = new Pool({
   port: 5432,
 });
 
-// ---------------------------------------------
-// LangChain components
-// ---------------------------------------------
-const embeddings = new OpenAIEmbeddings({
-  model: "text-embedding-3-small",
-});
+const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
 
 const store = await PGVectorStore.initialize(embeddings, {
   pool,
@@ -2165,48 +2169,27 @@ const store = await PGVectorStore.initialize(embeddings, {
   },
 });
 
-const llm = new ChatOpenAI({
-  model: "gpt-4o-mini",
-  temperature: 0,
-});
+const llm = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
+const retriever = store.asRetriever(3);
+const chain = RetrievalQAChain.fromLLM(llm, retriever, { returnSourceDocuments: true });
 
-const retriever = store.asRetriever(3); // top-3 results
-const chain = RetrievalQAChain.fromLLM(llm, retriever, {
-  returnSourceDocuments: true,
-});
+const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 400, chunkOverlap: 50 });
 
-// splitter for chunking PDF text
-const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 400,
-  chunkOverlap: 50,
-});
-
-// ---------------------------------------------
-// POST /upload-pdf : upload + index PDF
-// ---------------------------------------------
+// Upload and index PDF
 app.post("/upload-pdf", async (req, res) => {
   try {
     if (!req.files || !req.files.pdf) {
       return res.status(400).json({ error: "No PDF uploaded" });
     }
-
     const pdfFile = req.files.pdf;
     const docId = pdfFile.name || "unnamed";
-
-    // extract text from PDF
     const parsed = await pdfParse(pdfFile.data);
-
-    // split into chunks
     const docs = await splitter.createDocuments([parsed.text]);
-
-    // store with doc_id tag
     const docsWithMeta = docs.map(d => ({
       pageContent: d.pageContent,
       metadata: { doc_id: docId },
     }));
-
     await store.addDocuments(docsWithMeta);
-
     res.json({ message: "PDF indexed", docId, chunks: docs.length });
   } catch (err) {
     console.error("upload-pdf error:", err);
@@ -2214,17 +2197,12 @@ app.post("/upload-pdf", async (req, res) => {
   }
 });
 
-// ---------------------------------------------
-// POST /ask : ask a question
-// Body: { question: "..." }
-// ---------------------------------------------
+// Ask a question
 app.post("/ask", async (req, res) => {
   try {
     const { question } = req.body;
     if (!question) return res.status(400).json({ error: "Missing question" });
-
     const result = await chain.call({ query: question });
-
     res.json({
       answer: result.text,
       sources: result.sourceDocuments.map(d => ({
@@ -2238,94 +2216,54 @@ app.post("/ask", async (req, res) => {
   }
 });
 
-// ---------------------------------------------
-// Start server
-// ---------------------------------------------
 app.listen(3000, () => {
   console.log("LangChain RAG backend with PDF support running on http://localhost:3000");
 });
+```
 
-// =============================================
-// =============================================
-//
-// 1. Start backend:
-//    node server.js
-//
-// 2. Upload a PDF:
-//    curl -X POST http://localhost:3000/upload-pdf \
-//      -F "pdf=@myfile.pdf"
-//
-// 3. Ask a question:
-//    curl -X POST http://localhost:3000/ask \
-//      -H "Content-Type: application/json" \
-//      -d '{"question":"What is the refund policy?"}'
-//
-// 4. Response includes: answer + source chunks
-//
-// =============================================
-	•	Instead of us manually chunking & embedding, we now use:
-	•	RecursiveCharacterTextSplitter → better chunking.
-	•	PGVectorStore → embedding + storage handled by LangChain.
-	•	RetrievalQAChain → retrieval + LLM integrated automatically.
-	•	We still control ingestion (/upload-pdf) and querying (/ask) — but with less boilerplate.
-	2.	Next → I’ll extend this into multi-PDF support, with a doc_id filter, so you can query “All docs” or a specific one.
-	•	This means:
-	•	Store each PDF with a doc_id.
-	•	/docs endpoint → list all doc_ids available.
-	•	/ask endpoint → optional docId param to restrict retrieval.
-	•	Answers will cite [docId#chunkId].
-	3.	After that → we’ll move forward in your GenAI learning roadmap:
-	•	Learn Chains properly (beyond RetrievalQA).
-	•	Learn Agents: how they plan, use tools, and act autonomously.
-	•	Step into Agentic AI after we finish GenAI concepts solidly.
-// FULL STACK RAG (ONE FILE) — LangChain + pgvector + React
-// =======================================================
-//
-// CONTENTS:
-//   (A) BACKEND: Express + LangChain + Postgres/pgvector
-//   (B) FRONTEND: React + Material-UI (chatbot + PDF upload)
-//
-// Copy this file for your reference. In practice, split into:
-//   backend/server.js   and   frontend/src/App.js
-//
-// -------------------------------------------------------
-// PREREQS & SETUP
-// -------------------------------------------------------
-//
-// 1) Postgres with pgvector
-//    Option A: Local install (postgresql.org) then in psql:
-//      CREATE DATABASE rag_demo;
-//      \c rag_demo
-//      CREATE EXTENSION IF NOT EXISTS vector;
-//      -- Our table: content (text), embedding (vector), metadata (jsonb)
-//      CREATE TABLE documents (
-//        id SERIAL PRIMARY KEY,
-//        content   TEXT,
-//        embedding VECTOR(1536),
-//        metadata  JSONB
-//      );
-//      -- (Optional) ANN index for speed after inserts:
-//      CREATE INDEX ON documents USING ivfflat (embedding vector_l2_ops) WITH (lists = 100);
-//      ANALYZE documents;
-//
-//    Option B: Docker:
-//      docker run -d --name pgvector-demo -e POSTGRES_PASSWORD=postgres -p 5432:5432 ankane/pgvector
-//      -- Then psql in, and run the same SQL above.
-//
-// 2) Backend deps (in a Node project folder):
-//      npm i express dotenv pg express-fileupload pdf-parse
-//      npm i @langchain/openai @langchain/community langchain
-//      -- .env file (alongside server.js):
-//         OPENAI_API_KEY=sk-...your-key...
-//
-// 3) Frontend deps (in a React app):
-//      npm i @mui/material @emotion/react @emotion/styled
-//
-// -------------------------------------------------------
+---
+
+## 🧑‍💻 How to Run
+
+1. **Start backend:**
+   ```bash
+   node server.js
+   ```
+
+2. **Upload a PDF:**
+   ```bash
+   curl -X POST http://localhost:3000/upload-pdf \
+     -F "pdf=@myfile.pdf"
+   ```
+
+3. **Ask a question:**
+   ```bash
+   curl -X POST http://localhost:3000/ask \
+     -H "Content-Type: application/json" \
+     -d '{"question":"What is the refund policy?"}'
+   ```
+
+4. **Response includes:** answer + source chunks
+
+---
+
+**Key Points:**
+- Uses LangChain for chunking, embedding, storage, and retrieval.
+- PDF chunks are tagged with `doc_id` for source tracking.
+- RetrievalQAChain integrates retrieval and LLM answering.
+- Easily extendable for multi-PDF support and doc_id filtering.
+
+---
+
+Next steps:
+- Add multi-PDF support (doc_id filter, `/docs` endpoint).
+- Extend `/ask` to restrict queries to a specific document.
+- Answers will cite `[docId#chunkId]` for traceability.
+
+```js
 // (A) BACKEND: server.js (LangChain + Express + pgvector)
 // -------------------------------------------------------
 
-// ----- BACKEND START -----
 import express from "express";
 import fileUpload from "express-fileupload";     // to receive PDF files from UI
 import pdfParse from "pdf-parse";                // extract text from PDFs
@@ -2374,17 +2312,16 @@ const store = await PGVectorStore.initialize(embeddings, {
 // LLM & retrieval chain
 const llm = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
 
-// We’ll build retrievers per request to support filtering (All vs docId).
-// Base chain will be created dynamically to pass the correct retriever.
-
 // Chunker: keeps small overlapping chunks to improve retrieval quality
 const splitter = new RecursiveCharacterTextSplitter({
   chunkSize: 400,
   chunkOverlap: 50,
 });
 
-// ---------- Endpoint: list available documents ----------
-// Returns array of distinct doc_ids (from metadata->>'doc_id')
+/**
+ * Endpoint: list available documents
+ * Returns array of distinct doc_ids (from metadata->>'doc_id')
+ */
 app.get("/docs", async (_req, res) => {
   // Select distinct doc_id values from JSONB
   const query = `
@@ -2397,10 +2334,12 @@ app.get("/docs", async (_req, res) => {
   res.json({ docs: r.rows.map((row) => row.doc_id) });
 });
 
-// ---------- Endpoint: upload & index a PDF with docId ----------
-// FormData fields:
-//  - pdf: file
-//  - docId: optional string (if absent, fallback to filename)
+/**
+ * Endpoint: upload & index a PDF with docId
+ * FormData fields:
+ *  - pdf: file
+ *  - docId: optional string (if absent, fallback to filename)
+ */
 app.post("/upload-pdf", async (req, res) => {
   try {
     if (!req.files || !req.files.pdf) {
@@ -2433,9 +2372,11 @@ app.post("/upload-pdf", async (req, res) => {
   }
 });
 
-// ---------- Endpoint: ask a question (All docs or specific docId) ----------
-// Body:
-//   { "question": "Your question...", "docId": "ALL" | "<some id>" }
+/**
+ * Endpoint: ask a question (All docs or specific docId)
+ * Body:
+ *   { "question": "Your question...", "docId": "ALL" | "<some id>" }
+ */
 app.post("/ask", async (req, res) => {
   try {
     const { question, docId = "ALL" } = req.body;
@@ -2475,10 +2416,29 @@ app.post("/ask", async (req, res) => {
 app.listen(3000, () => {
   console.log("Backend running on http://localhost:3000");
 });
-// ----- BACKEND END -----
+```
+
+**SQL: Postgres Table Setup**
+```sql
+CREATE DATABASE rag_demo;
+\c rag_demo
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE TABLE documents (
+  id SERIAL PRIMARY KEY,
+  content TEXT,
+  embedding VECTOR(1536),
+  metadata JSONB
+);
+```
+
+**Bash: Install dependencies**
+```bash
+npm install express fileupload pdf-parse dotenv pg @langchain/openai @langchain/community langchain
+```
 
 
 
+```js
 // -------------------------------------------------------
 // (B) FRONTEND: src/App.js (React + MUI)
 // -------------------------------------------------------
@@ -2648,357 +2608,111 @@ function App() {
 
 export default App;
 // ----- FRONTEND END -----
-
-
-
-// -------------------------------------------------------
-// HOW TO RUN (Quick Recap)
-// -------------------------------------------------------
-// Backend: node server.js   (make sure .env has OPENAI_API_KEY)
-// Frontend: npm start       (React app where this App component is used)
-// In browser:
-//   1) Upload a PDF (+ optional docId)
-//   2) Select "All Documents" or a specific docId
-//   3) Ask questions — answers will cite [docId#chunkIndex]
-// -------------------------------------------------------
-
-1. Chains (Beyond RetrievalQA)
-
-A Chain in LangChain is just:
-
-So far, we’ve only used a RetrievalQAChain (retrieve → pass to LLM → answer). But LangChain supports many chain patterns:
-	•	LLMChain: simplest, just prompt + LLM.
-	•	SequentialChain: run multiple steps in order (like function composition).
-	•	Refine Chain: build answer incrementally (chunk 1 → partial answer, refine with chunk 2, etc.). Useful for high-fidelity answers.
-	•	RouterChain: decide which chain to use based on input. E.g., “If it’s about SQL, use DB chain; if about docs, use RAG.”
-
-➡️ Why important?
-They let you control how information is processed — not just retrieve and dump into an LLM.
-
-⸻
-
-2. Agents (First Glimpse)
-
-An Agent is a higher-level construct:
-	•	Tools: APIs, calculators, databases, search engines, Python REPL, etc.
-	•	Agent loop:
-	1.	Receive user query
-	2.	Plan: “I need to call SQL first, then summarize.”
-	3.	Act: call tool(s)
-	4.	Observe: read results
-	5.	Iterate until answer
-
-Example:
-	•	Q: “What’s the average price of cars in the last 30 days, and summarize as a haiku?”
-	•	Agent decides: query DB → compute average → then ask LLM to format as haiku.
-
-➡️ This is the start of Agentic AI (autonomous decision-making).
-
-⸻
-
-3. Memory
-
-So far, our chatbot only handles one question at a time.
-Memory = keeping conversation context (like a session).
-	•	BufferMemory: keep all past messages.
-	•	SummaryMemory: summarize history to stay within token limits.
-	•	VectorStoreRetrieverMemory: long-term memory, where past conversations are embedded + retrieved when relevant.
-
-➡️ Why?
-Without memory, an “agent” is just stateless. With memory, it can remember past user goals.
-
-⸻
-
-4. Evaluation & Guardrails
-
-Once you build, you need to check:
-	•	Is the model grounded (not hallucinating)?
-	•	Is the answer relevant and safe?
-
-Tools:
-	•	LangSmith (LangChain’s eval/observability).
-	•	Guardrails AI, Pydantic validation, regex filters.
-
-➡️ Important before going production.
-	1.	Next session → I’ll teach you Chains in detail with practical demos (Map-Reduce, Refine).
-	2.	Then → move to Agents: how they reason, plan, and call tools.
-	3.	Then → Memory: give our chatbot context.
-	4.	Finally → Agentic AI (tying it all together).
-
-A Chain = Input → Series of steps → Output.
-It’s a workflow around an LLM.
-
-Why use Chains?
-	•	To break a complex task into smaller steps.
-	•	To handle large documents (too big for context window).
-	•	To combine multiple reasoning styles (e.g., summarize + refine).
-	•	To make pipelines reusable & composable.
-
-⸻
-
-🔑 Main Types of Chains
-
-1. LLMChain
-	•	Simplest chain: just a prompt + LLM.
-	•	Example: “Summarize this text” → LLM → summary.
-
-⸻
-
-2. Map-Reduce Chain
-	•	Idea comes from distributed computing:
-	•	Map step → apply LLM to each chunk (summarize each).
-	•	Reduce step → combine summaries into one.
-
-
-⸻
-
-3. Refine Chain
-	•	Step-by-step incremental building:
-	•	Start with first chunk → draft summary.
-	•	For each next chunk → refine summary.
-
-	•	Slower, more costly, but better quality than map-reduce.
-
-⸻
-
-4. Router Chains
-	•	Decide which chain to use based on the query.
-	•	Example:
-	•	If query is “translate” → TranslationChain.
-	•	If query is “summarize” → SummarizationChain.
-
-
-⸻
-
-🖥️ Practical Examples (LangChain JS)
-
-Below I’ll show two detailed examples with inline notes:
-	1.	Map-Reduce summarization
-	2.	Refine summarization
-
-⸻
-
-📄 Example 1: Map-Reduce Summarization
-// MAP-REDUCE SUMMARY CHAIN (LangChain JS)
-// =====================================
-//
-// npm install @langchain/openai langchain
-//
-import { ChatOpenAI } from "@langchain/openai";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { loadSummarizationChain } from "langchain/chains";
-
-// LLM setup
-const llm = new ChatOpenAI({
-  model: "gpt-4o-mini",
-  temperature: 0,
-});
-
-// Sample long text (simulate PDF text)
-const text = `
-Artificial intelligence is transforming industries...
-(pretend this is 20 pages of content)
-`;
-
-// Step 1: Split text into chunks
-const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 500,
-  chunkOverlap: 50,
-});
-const docs = await splitter.createDocuments([text]);
-
-// Step 2: Load summarization chain (map-reduce)
-const chain = loadSummarizationChain(llm, { type: "map_reduce" });
-
-// Step 3: Run the chain
-const summary = await chain.call({ input_documents: docs });
-console.log("Map-Reduce Summary:", summary.text);
-	•	Split text → summarize each part (“map”) → merge into final summary (“reduce”).
-	•	Fast + scalable, but can sometimes lose nuance.
-// REFINE SUMMARY CHAIN (LangChain JS)
-// =====================================
-//
-// npm install @langchain/openai langchain
-//
-import { ChatOpenAI } from "@langchain/openai";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { loadSummarizationChain } from "langchain/chains";
-
-// LLM setup
-const llm = new ChatOpenAI({
-  model: "gpt-4o-mini",
-  temperature: 0,
-});
-
-// Long text
-const text = `
-Deep learning models use neural networks...
-(and so on, imagine many pages)
-`;
-
-// Split into docs
-const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 500,
-  chunkOverlap: 50,
-});
-const docs = await splitter.createDocuments([text]);
-
-// Refine chain
-const chain = loadSummarizationChain(llm, { type: "refine" });
-
-// Run chain
-const summary = await chain.call({ input_documents: docs });
-console.log("Refine Summary:", summary.text);
-	•	Start with a summary draft from first chunk.
-	•	For each new chunk → “Refine the summary considering this new info.”
-	•	Better quality, but slower & more tokens.
-
-⸻
-
-	•	Chains let you structure tasks around LLMs.
-	•	Map-Reduce = scalable, good for long docs, but may oversimplify.
-	•	Refine = slower, better accuracy, keeps context.
-	•	Router chains = choose pipeline dynamically.
-	•	In real apps → you often combine RAG + chains (e.g., retrieve chunks, then summarize them with map-reduce).
-	1.	Upload a PDF (already working).
-	2.	Ask questions about the PDF (already working).
-	3.	Summarize the whole PDF using either map-reduce (fast, scalable) or refine (high-fidelity).
-
-⸻
-
-🖥️ Updated Backend Code (server.js)
-// LangChain RAG Backend + PDF Summarization
-// ==================================================
-//
-// Endpoints now include:
-//   - /upload-pdf  → store chunks in pgvector
-//   - /ask         → question-answering (RAG)
-//   - /summarize   → summarize PDF (map-reduce or refine)
-//
-// --------------------------------------------------
-// Dependencies (add if not installed):
-//   npm install @langchain/openai @langchain/community langchain
-//   npm install express dotenv pg express-fileupload pdf-parse
-// --------------------------------------------------
-
-import express from "express";
-import fileUpload from "express-fileupload";
-import pdfParse from "pdf-parse";
-import "dotenv/config";
-import pkg from "pg";
-
-import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
-import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { RetrievalQAChain, loadSummarizationChain } from "langchain/chains";
-
-const { Pool } = pkg;
-
-// Setup Express
-const app = express();
-app.use(express.json());
-app.use(fileUpload());
-
-// Postgres setup
-const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "rag_demo",
-  password: "postgres",
-  port: 5432,
-});
-
-// Embeddings
-const embeddings = new OpenAIEmbeddings({
-  model: "text-embedding-3-small",
-});
-
-// Vector Store (with metadata for doc_id, chunk_index)
-const store = await PGVectorStore.initialize(embeddings, {
-  pool,
-  tableName: "documents",
-  columns: {
-    idColumnName: "id",
-    contentColumnName: "content",
-    vectorColumnName: "embedding",
-    metadataColumnName: "metadata",
-  },
-});
-
-// LLM
-const llm = new ChatOpenAI({
-  model: "gpt-4o-mini",
-  temperature: 0,
-});
-
-// Retriever chain (built dynamically later)
-const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 400,
-  chunkOverlap: 50,
-});
-
-// ---------- /upload-pdf ----------
-app.post("/upload-pdf", async (req, res) => {
-  try {
-    if (!req.files || !req.files.pdf) {
-      return res.status(400).json({ error: "No PDF uploaded" });
-    }
-    const pdfFile = req.files.pdf;
-    const docId = (req.body.docId || pdfFile.name || "unnamed").toString();
-
-    const parsed = await pdfParse(pdfFile.data);
-    const docs = await splitter.createDocuments([parsed.text]);
-
-    const docsWithMeta = docs.map((d, i) => ({
-      pageContent: d.pageContent,
-      metadata: { doc_id: docId, chunk_index: i },
-    }));
-
-    await store.addDocuments(docsWithMeta);
-
-    res.json({ message: "PDF indexed", docId, chunks: docsWithMeta.length });
-  } catch (err) {
-    console.error("upload-pdf error:", err);
-    res.status(500).json({ error: "Failed to index PDF" });
-  }
-});
-
-// ---------- /ask ----------
-app.post("/ask", async (req, res) => {
-  try {
-    const { question, docId = "ALL" } = req.body;
-    if (!question) return res.status(400).json({ error: "Missing question" });
-
-    const searchKwargs =
-      docId !== "ALL" ? { filter: { doc_id: docId } } : undefined;
-    const retriever = store.asRetriever(3, searchKwargs);
-
-    const chain = RetrievalQAChain.fromLLM(llm, retriever, {
-      returnSourceDocuments: true,
-    });
-
-    const result = await chain.call({ query: question });
-
-    res.json({
-      answer: result.text,
-      sources: (result.sourceDocuments || []).map((d) => ({
-        docId: d.metadata?.doc_id || "unknown",
-        chunkIndex: d.metadata?.chunk_index ?? null,
-        preview: d.pageContent.slice(0, 200),
-      })),
-    });
-  } catch (err) {
-    console.error("ask error:", err);
-    res.status(500).json({ error: "Failed to answer question" });
-  }
-});
-
-// ---------- /summarize ----------
+```
+
+```bash
+# -------------------------------------------------------
+# HOW TO RUN (Quick Recap)
+# -------------------------------------------------------
+# Backend: node server.js   (make sure .env has OPENAI_API_KEY)
+# Frontend: npm start       (React app where this App component is used)
+# In browser:
+#   1) Upload a PDF (+ optional docId)
+#   2) Select "All Documents" or a specific docId
+#   3) Ask questions — answers will cite [docId#chunkIndex]
+# -------------------------------------------------------
+```
+
+## 1. Chains (Beyond RetrievalQA)
+
+A **Chain** in LangChain is a workflow:  
+`Input → Series of steps → Output`  
+It lets you break complex tasks into smaller, reusable steps around an LLM.
+
+**Why use Chains?**
+- Handle large documents (context window limits).
+- Combine multiple reasoning styles (summarize + refine).
+- Make pipelines reusable & composable.
+
+---
+
+### 🔑 Main Types of Chains
+
+#### 1. LLMChain
+- Simplest: just a prompt + LLM.
+- Example:
+  ```js
+  import { ChatOpenAI } from "@langchain/openai";
+  import { LLMChain } from "langchain/chains";
+
+  const llm = new ChatOpenAI({ model: "gpt-4o-mini" });
+  const chain = new LLMChain({ llm, prompt: "Summarize this text: {input}" });
+
+  const result = await chain.call({ input: "Long text here..." });
+  console.log(result.text);
+  ```
+
+---
+
+#### 2. Map-Reduce Chain
+- **Map:** Apply LLM to each chunk (summarize each).
+- **Reduce:** Combine summaries into one.
+- Scalable, fast, but may lose nuance.
+
+  ```js
+  import { ChatOpenAI } from "@langchain/openai";
+  import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+  import { loadSummarizationChain } from "langchain/chains";
+
+  const llm = new ChatOpenAI({ model: "gpt-4o-mini" });
+  const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 500, chunkOverlap: 50 });
+  const docs = await splitter.createDocuments([longText]);
+
+  const chain = loadSummarizationChain(llm, { type: "map_reduce" });
+  const summary = await chain.call({ input_documents: docs });
+  console.log("Map-Reduce Summary:", summary.text);
+  ```
+
+---
+
+#### 3. Refine Chain
+- Builds answer incrementally:  
+  Start with chunk 1 → draft summary, then refine with each new chunk.
+- Slower, more tokens, but higher quality.
+
+  ```js
+  import { ChatOpenAI } from "@langchain/openai";
+  import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+  import { loadSummarizationChain } from "langchain/chains";
+
+  const llm = new ChatOpenAI({ model: "gpt-4o-mini" });
+  const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 500, chunkOverlap: 50 });
+  const docs = await splitter.createDocuments([longText]);
+
+  const chain = loadSummarizationChain(llm, { type: "refine" });
+  const summary = await chain.call({ input_documents: docs });
+  console.log("Refine Summary:", summary.text);
+  ```
+
+---
+
+#### 4. Router Chains
+- Decide which chain to use based on the query.
+- Example:  
+  If query is "translate" → TranslationChain.  
+  If query is "summarize" → SummarizationChain.
+
+---
+
+## 🖥️ Backend Example: PDF Summarization
+
+Add `/summarize` endpoint to your Express backend:
+
+```js
+// /summarize endpoint (map-reduce or refine)
 app.post("/summarize", async (req, res) => {
   try {
     const { docId = "ALL", mode = "map_reduce" } = req.body;
-
-    // Fetch all chunks for the docId
     let results;
     if (docId !== "ALL") {
       results = await pool.query(
@@ -3008,422 +2722,179 @@ app.post("/summarize", async (req, res) => {
     } else {
       results = await pool.query("SELECT content FROM documents ORDER BY id ASC");
     }
-
     if (results.rows.length === 0) {
       return res.status(404).json({ error: "No documents found" });
     }
-
-    // Convert rows to LangChain docs
     const docs = results.rows.map((row) => ({
       pageContent: row.content,
       metadata: {},
     }));
-
-    // Choose summarization mode
     const chain = loadSummarizationChain(llm, { type: mode });
-
     const summary = await chain.call({ input_documents: docs });
-
     res.json({
       summary: summary.text,
       chunksProcessed: docs.length,
       mode,
     });
   } catch (err) {
-    console.error("summarize error:", err);
     res.status(500).json({ error: "Failed to summarize document(s)" });
   }
 });
+```
 
-// Start server
-app.listen(3000, () => {
-  console.log("Backend with summarization running on http://localhost:3000");
-});
+---
 
-1. Upload
-	•	/upload-pdf → PDF → text → chunk → embeddings → store in pgvector with doc_id.
+## 🖥️ Frontend Example: Summarization Button
 
-2. Ask
-	•	/ask → embed question → retrieve top-3 relevant chunks → LLM answers with context.
+Add a summarization mode selector and button:
 
-3. Summarize
-	•	/summarize → fetch all chunks for given docId (or all docs).
-	•	Run summarization chain (map_reduce or refine).
-	•	Return single summary string.
-	•	Use map-reduce for faster, scalable summaries.
-	•	Use refine for more accurate, detail-preserving summaries.
+```js
+// Summarization mode selector
+<FormControl fullWidth sx={{ mb: 2 }}>
+  <InputLabel id="mode-select-label">Summarization Mode</InputLabel>
+  <Select
+    labelId="mode-select-label"
+    value={mode}
+    onChange={e => setMode(e.target.value)}
+  >
+    <MenuItem value="map_reduce">Map-Reduce (faster, scalable)</MenuItem>
+    <MenuItem value="refine">Refine (slower, more accurate)</MenuItem>
+  </Select>
+</FormControl>
 
-This means you’ll have:
-	•	Upload PDF (already there).
-	•	Ask questions (already there).
-	•	Summarize Document button → choose docId + summarization mode (map-reduce or refine).
+// Summarize button
+<Button
+  fullWidth
+  variant="outlined"
+  sx={{ mb: 2 }}
+  onClick={summarize}
+>
+  Summarize Document
+</Button>
 
-⸻
-
-🖥️ Updated Frontend (src/App.js)
-// React Frontend — Chatbot + Summarization
-// ==================================================
-//
-// Features:
-//  - Upload PDFs with optional docId
-//  - Select a document (or All)
-//  - Chatbot Q&A over selected doc
-//  - Summarize a document (map-reduce or refine)
-//
-// Prereqs: npm install @mui/material @emotion/react @emotion/styled
-//
-// Backend: node server.js (with summarization endpoints)
-//
-// ==================================================
-
-import { useEffect, useState } from "react";
-import {
-  Box, Button, Container, Paper, TextField, Typography,
-  MenuItem, Select, InputLabel, FormControl
-} from "@mui/material";
-
-function App() {
-  // Chat state
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-
-  // Doc list + selection
-  const [docIds, setDocIds] = useState([]);
-  const [activeDocId, setActiveDocId] = useState("ALL");
-
-  // PDF upload
-  const [pdf, setPdf] = useState(null);
-  const [newDocId, setNewDocId] = useState("");
-
-  // Summarization mode
-  const [mode, setMode] = useState("map_reduce");
-
-  // Load available docs
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("http://localhost:3000/docs");
-        const data = await res.json();
-        setDocIds(data.docs || []);
-      } catch {
-        // ignore
-      }
-    })();
-  }, []);
-
-  // Upload PDF
-  async function uploadPdf() {
-    if (!pdf) return alert("Choose a PDF first");
-    const form = new FormData();
-    form.append("pdf", pdf);
-    if (newDocId.trim()) form.append("docId", newDocId.trim());
-
-    const res = await fetch("http://localhost:3000/upload-pdf", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json();
-    if (data.error) return alert("Upload failed: " + data.error);
-
-    alert(`Indexed "${data.docId}" with ${data.chunks} chunks`);
-    setNewDocId("");
-    setPdf(null);
-
-    // Refresh docs
-    const list = await fetch("http://localhost:3000/docs").then(r => r.json());
-    setDocIds(list.docs || []);
-  }
-
-  // Ask a question
-  async function sendMessage() {
-    if (!input.trim()) return;
-
-    const newMessages = [...messages, { role: "user", content: input }];
-    setMessages(newMessages);
-
-    const res = await fetch("http://localhost:3000/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: input, docId: activeDocId }),
-    });
-    const data = await res.json();
-
-    const sources = (data.sources || [])
-      .map(s => `[${s.docId}#${s.chunkIndex ?? "?"}]`)
-      .join(" ");
-
-    const assistant = `${data.answer || "(no answer)"}\n\nSources: ${sources || "N/A"}`;
-
-    setMessages([...newMessages, { role: "assistant", content: assistant }]);
-    setInput("");
-  }
-
-  // Summarize doc
-  async function summarize() {
-    const res = await fetch("http://localhost:3000/summarize", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ docId: activeDocId, mode }),
-    });
-    const data = await res.json();
-
-    const newMessages = [
-      ...messages,
-      {
-        role: "assistant",
-        content: `📄 Summary (${mode}) for ${activeDocId}:\n\n${data.summary || "(no summary)"}\n\nChunks processed: ${data.chunksProcessed}`,
-      },
-    ];
-    setMessages(newMessages);
-  }
-
-  return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        RAG Chatbot + Summarization
-      </Typography>
-
-      {/* Upload */}
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h6" gutterBottom>Upload PDF</Typography>
-        <Box display="flex" gap={1} alignItems="center" mb={1}>
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={e => setPdf(e.target.files?.[0] || null)}
-          />
-          <TextField
-            label="docId (optional)"
-            size="small"
-            value={newDocId}
-            onChange={e => setNewDocId(e.target.value)}
-          />
-          <Button variant="contained" onClick={uploadPdf}>Upload</Button>
-        </Box>
-      </Paper>
-
-      {/* Doc filter */}
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel id="doc-select-label">Answer From</InputLabel>
-        <Select
-          labelId="doc-select-label"
-          value={activeDocId}
-          onChange={e => setActiveDocId(e.target.value)}
-        >
-          <MenuItem value="ALL">All Documents</MenuItem>
-          {docIds.map(id => (
-            <MenuItem key={id} value={id}>{id}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      {/* Summarization mode */}
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel id="mode-select-label">Summarization Mode</InputLabel>
-        <Select
-          labelId="mode-select-label"
-          value={mode}
-          onChange={e => setMode(e.target.value)}
-        >
-          <MenuItem value="map_reduce">Map-Reduce (faster, scalable)</MenuItem>
-          <MenuItem value="refine">Refine (slower, more accurate)</MenuItem>
-        </Select>
-      </FormControl>
-
-      {/* Summarize button */}
-      <Button
-        fullWidth
-        variant="outlined"
-        sx={{ mb: 2 }}
-        onClick={summarize}
-      >
-        Summarize Document
-      </Button>
-
-      {/* Chat window */}
-      <Paper sx={{ p: 2, mb: 2, height: 420, overflowY: "auto", border: "1px solid #ddd" }}>
-        {messages.map((m, i) => (
-          <Box key={i} display="flex" justifyContent={m.role === "user" ? "flex-end" : "flex-start"} mb={1}>
-            <Box
-              sx={{
-                px: 2, py: 1, borderRadius: 2,
-                bgcolor: m.role === "user" ? "primary.main" : "grey.300",
-                color: m.role === "user" ? "white" : "black",
-                maxWidth: "80%",
-                whiteSpace: "pre-wrap"
-              }}
-            >
-              {m.content}
-            </Box>
-          </Box>
-        ))}
-      </Paper>
-
-      {/* Input + Send */}
-      <Box display="flex" gap={1}>
-        <TextField
-          fullWidth
-          label="Type your question..."
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && sendMessage()}
-        />
-        <Button variant="contained" onClick={sendMessage}>Send</Button>
-      </Box>
-    </Container>
-  );
+// Summarize function
+async function summarize() {
+  const res = await fetch("http://localhost:3000/summarize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ docId: activeDocId, mode }),
+  });
+  const data = await res.json();
+  const newMessages = [
+    ...messages,
+    {
+      role: "assistant",
+      content: `📄 Summary (${mode}) for ${activeDocId}:\n\n${data.summary || "(no summary)"}\n\nChunks processed: ${data.chunksProcessed}`,
+    },
+  ];
+  setMessages(newMessages);
 }
+```
 
-export default App;
-	•	Added summarization mode selector (map-reduce / refine).
-	•	Added Summarize Document button → calls /summarize endpoint.
-	•	Assistant’s summary output is shown in the chat window as a new message.
+---
 
-⸻
+**Summary:**
+- Chains let you structure LLM workflows for summarization, multi-step reasoning, or dynamic routing.
+- Map-Reduce: fast, scalable summaries.
+- Refine: slower, more accurate summaries.
+- Router: dynamic pipeline selection.
+- Integrate summarization into your MERN RAG app with a backend endpoint and frontend button.
 
-	•	Agents → how models use tools, plan steps, and act autonomously.
+## 🧑‍💻 Agents: Planning, Acting, and Autonomy in GenAI
 
-I’ll give you a detailed, step-by-step teaching session here — think of this as your “intro + fundamentals” of Agents in GenAI.
+Agents are LLM-powered workflows that **plan steps, use tools, and act autonomously**.  
+Instead of a fixed pipeline (input → retrieval → answer), Agents run a loop:
 
-An Agent is like a small AI “worker” that can:
-	1.	Receive a goal/question
-	2.	Decide which steps/tools it needs
-	3.	Execute those steps
-	4.	Iterate until it has an answer
+1. **Plan:** Decide what to do next.
+2. **Act:** Call a tool (retriever, calculator, API, etc.).
+3. **Observe:** Read the result.
+4. **Repeat:** Iterate until a final answer is produced.
 
-Instead of a fixed chain (input → retrieval → answer), an Agent has a loop:
-	•	Plan (what do I need to do?)
-	•	Act (call a tool or API)
-	•	Observe (read the result)
-	•	Repeat until done
+This is the core of **Agentic AI**—models that reason and act, not just generate.
 
-This is why Agents are called Agentic AI → they feel more autonomous.
+---
 
-⸻
+### 🔧 Agent Tools
 
-🔧 Tools for Agents
+Agents use tools to interact with the world:
+- **Retriever:** Search your vector DB (pgvector, Pinecone, etc.).
+- **Calculator:** Solve math problems.
+- **API:** Fetch external data (weather, stocks, etc.).
+- **Custom Functions:** Any logic you expose.
 
-Agents rely on tools. A tool is just something the Agent can use:
-	•	A retriever (like your pgvector database).
-	•	A calculator (for math problems).
-	•	An API call (weather, stocks, etc.).
-	•	A Python REPL (execute code).
-	•	A custom function you expose.
+The Agent chooses which tool to use based on the query.
 
-The Agent doesn’t know the answer itself → it knows how to decide when and how to use tools.
+---
 
-⸻
+### 🔑 Why Agents?
 
-🔑 Why Do We Need Agents?
+**Example:**  
+*"From my PDF, calculate the average price of cars in the last 30 days, then summarize in bullet points."*
 
-Think of this example:
+A simple RAG chain can only retrieve and summarize.  
+An Agent can:
+1. Retrieve relevant data from your DB.
+2. Use a calculator tool for math.
+3. Generate a summary with the LLM.
 
-“From my PDF, calculate the average price of cars in the last 30 days, then write me a summary in bullet points.”
+---
 
-A simple RAG chain can only retrieve text and summarize.
-But an Agent could:
-	1.	Retrieve data from your vector DB.
-	2.	Call a calculator tool to compute the average.
-	3.	Call LLM to generate bullet points.
+### 🧠 Agent Types in LangChain
 
-⸻
+1. **ReAct Agent:**  
+  - LLM reasons ("I should check DB") and acts ("call retriever"), looping until done.
+2. **Plan-and-Execute Agent:**  
+  - Plans multi-step tasks, then executes each step.
+3. **Structured Tool Agent:**  
+  - Picks and executes tools based on strict schemas.
 
-🧠 Types of Agents in LangChain
-	1.	ReAct Agent (Reason + Act):
-	•	Most common.
-	•	LLM outputs both thought (“I should check DB”) and action (“call retriever”).
-	•	Runs in a loop until finished.
-	2.	Plan-and-Execute Agents:
-	•	First step: create a plan (multi-step).
-	•	Then execute plan step by step.
-	3.	Structured Tool Agents:
-	•	Tools are strictly typed, Agent picks and executes based on schema.
+---
 
-⸻
+### 🖥️ Example: Agent with Calculator Tool
 
-🖥️ Example: Simple Agent with Calculator Tool
+```js
 // LangChain Agent with Calculator Tool
-// =======================================
-//
-// npm install @langchain/openai langchain
-//
 import { ChatOpenAI } from "@langchain/openai";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { Calculator } from "langchain/tools/calculator";
 
-// 1. Define LLM
 const llm = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
-
-// 2. Define available tools
 const tools = [new Calculator()];
-
-// 3. Create agent
 const executor = await initializeAgentExecutorWithOptions(tools, llm, {
-  agentType: "openai-functions", // modern structured agent
+  agentType: "openai-functions",
   verbose: true,
 });
 
-// 4. Ask a question requiring tool use
-const result = await executor.call({
-  input: "What is 23 * 7 plus 55?",
-});
-
+const result = await executor.call({ input: "What is 23 * 7 plus 55?" });
 console.log("Final Answer:", result.output);
-	•	It plans → “I should use calculator.”
-	•	It acts → calls Calculator tool.
-	•	It observes → result is 216.
-	•	It answers → “Final Answer: 216”.
+```
 
-⸻
+---
 
-📄 Example: Agent with Retriever Tool
+### 📄 Example: Agent with Retriever Tool
 
-You can even expose your vector DB retriever as a tool:
+Expose your vector DB retriever as a tool:
+
+```js
 const retriever = store.asRetriever(3);
+import { createRetrieverTool } from "langchain/tools";
 const retrieverTool = createRetrieverTool(retriever, {
   name: "pdf_search",
   description: "Search through uploaded PDF documents",
 });
-	•	Use pdf_search tool if user asks about PDFs.
-	•	Use calculator tool if math is needed.
-	•	Or combine them!
+```
 
-⸻
+Now the Agent can choose between searching PDFs or doing math.
 
-	•	Chains = fixed pipelines.
-	•	Agents = dynamic, adaptive pipelines.
-	•	Tools = the Agent’s “hands” to interact with external world.
-	•	Agents let LLMs plan + act, making them more autonomous.
+---
 
-⸻
+### 🖥️ Multi-Tool Agent Backend Example
 
-I can show you how to build a multi-tool Agent that:
-	1.	Uses your RAG retriever as one tool.
-	2.	Uses a Calculator as another tool.
-	3.	Lets the Agent decide which to use per query.
-	•	Tools for the Agent:
-	1.	Retriever Tool → connected to your PGVectorStore (so the Agent can “search PDFs”).
-	2.	Calculator Tool → for math queries.
-	•	Agent:
-	•	Runs with openai-functions (structured reasoning).
-	•	Decides whether to use the retriever, the calculator, or just the LLM.
-	•	Backend (Express):
-	•	/ask-agent endpoint → accepts a query → lets the Agent decide how to answer.
-	•	Behind the scenes, the Agent may call your retriever tool, your calculator tool, or both.
-
-⸻
-
-🖥️ Example Backend (server.js with Retrieval Tool)
+```js
 // LangChain Agent with Retriever Tool + Calculator
-// ==================================================
-//
-// npm install express dotenv pg
-// npm install @langchain/openai @langchain/community langchain
-//
 import express from "express";
 import "dotenv/config";
 import pkg from "pg";
-
 import { ChatOpenAI } from "@langchain/openai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -3432,12 +2903,9 @@ import { Calculator } from "langchain/tools/calculator";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 
 const { Pool } = pkg;
-
-// Express app
 const app = express();
 app.use(express.json());
 
-// Postgres setup
 const pool = new Pool({
   user: "postgres",
   host: "localhost",
@@ -3446,193 +2914,107 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Vector store
 const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
 const store = await PGVectorStore.initialize(embeddings, {
   pool,
   tableName: "documents",
   columns: {
-    idColumnName: "id",
-    contentColumnName: "content",
-    vectorColumnName: "embedding",
-    metadataColumnName: "metadata",
+   idColumnName: "id",
+   contentColumnName: "content",
+   vectorColumnName: "embedding",
+   metadataColumnName: "metadata",
   },
 });
 
-// Retriever tool
 const retriever = store.asRetriever(3);
 const retrieverTool = createRetrieverTool(retriever, {
   name: "pdf_search",
   description: "Searches uploaded PDF documents for relevant information",
 });
-
-// Calculator tool
 const calcTool = new Calculator();
 
-// Agent setup
 const llm = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
 const tools = [retrieverTool, calcTool];
 const executor = await initializeAgentExecutorWithOptions(tools, llm, {
-  agentType: "openai-functions", // structured agent
-  verbose: true,                 // logs reasoning steps in console
+  agentType: "openai-functions",
+  verbose: true,
 });
 
-// Endpoint: /ask-agent
 app.post("/ask-agent", async (req, res) => {
   try {
-    const { question } = req.body;
-    if (!question) return res.status(400).json({ error: "Missing question" });
-
-    const result = await executor.call({ input: question });
-    res.json({ answer: result.output });
+   const { question } = req.body;
+   if (!question) return res.status(400).json({ error: "Missing question" });
+   const result = await executor.call({ input: question });
+   res.json({ answer: result.output });
   } catch (err) {
-    console.error("ask-agent error:", err);
-    res.status(500).json({ error: "Agent failed" });
+   console.error("ask-agent error:", err);
+   res.status(500).json({ error: "Agent failed" });
   }
 });
 
-// Start server
 app.listen(3000, () => {
   console.log("Agent backend running on http://localhost:3000");
 });
-	1.	User calls /ask-agent with a query.
-	2.	Agent decides:
-	•	If it’s a math problem → use Calculator.
-	•	If it’s about PDFs → use pdf_search retriever.
-	•	If it’s a reasoning task → just use the LLM.
-	3.	Agent runs in a loop (plan → act → observe) until done.
-Next, we’ll go deeper into:
-	•	How the Agent’s reasoning loop works step by step.
-	•	Adding more tools (e.g., web search, database queries).
-	•	How this leads into Agentic AI systems (multi-agent collaboration).
+```
 
-When you ask the Agent a question, it doesn’t just answer directly. Instead it goes through cycles:
-	1.	Thought → “What should I do next?”
-	2.	Action → “I will call the pdf_search tool with this input.”
-	3.	Observation → “Tool returned this result.”
-	4.	Repeat until it can produce a Final Answer.
+---
 
-LangChain lets you log this reasoning when you enable verbose: true.
+### 📝 How Agent Reasoning Works
 
-⸻
+When you POST to `/ask-agent`, the Agent:
+1. **Thinks:** "Should I use the calculator or search PDFs?"
+2. **Acts:** Calls the chosen tool.
+3. **Observes:** Reads the result.
+4. **Repeats:** Loops until it can answer.
 
-🖥️ Example: Multi-Tool Agent (with reasoning logs)
-// LangChain Agent with Retriever + Calculator + Logs
-// ==================================================
-//
-// npm install express dotenv pg
-// npm install @langchain/openai @langchain/community langchain
-//
-import express from "express";
-import "dotenv/config";
-import pkg from "pg";
+With `verbose: true`, you see the reasoning steps in your server console.
 
-import { ChatOpenAI } from "@langchain/openai";
-import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { createRetrieverTool } from "langchain/tools";
-import { Calculator } from "langchain/tools/calculator";
-import { initializeAgentExecutorWithOptions } from "langchain/agents";
+---
 
-const { Pool } = pkg;
+**Summary:**
+- **Chains:** Fixed pipelines.
+- **Agents:** Dynamic, adaptive workflows.
+- **Tools:** The Agent's "hands" for external actions.
+- **Agents** enable LLMs to plan, act, and solve complex tasks autonomously.
 
-const app = express();
-app.use(express.json());
+---
 
-// Postgres connection
-const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "rag_demo",
-  password: "postgres",
-  port: 5432,
-});
+**Next Steps:**  
+- Add more tools (web search, database queries).
+- Explore multi-agent systems (agents collaborating).
+- Return intermediate reasoning steps to the frontend for transparency.
 
-// Vector store + retriever
-const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
-const store = await PGVectorStore.initialize(embeddings, {
-  pool,
-  tableName: "documents",
-  columns: {
-    idColumnName: "id",
-    contentColumnName: "content",
-    vectorColumnName: "embedding",
-    metadataColumnName: "metadata",
-  },
-});
-const retriever = store.asRetriever(3);
-
-// Tools
-const retrieverTool = createRetrieverTool(retriever, {
-  name: "pdf_search",
-  description: "Searches uploaded PDF documents for relevant information.",
-});
-const calcTool = new Calculator();
-
-// Agent setup
-const llm = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
-const tools = [retrieverTool, calcTool];
-const executor = await initializeAgentExecutorWithOptions(tools, llm, {
-  agentType: "openai-functions", // structured agent reasoning
-  verbose: true,                 // 👈 this prints reasoning logs
-});
-
-// Endpoint: /ask-agent
-app.post("/ask-agent", async (req, res) => {
-  try {
-    const { question } = req.body;
-    if (!question) return res.status(400).json({ error: "Missing question" });
-
-    const result = await executor.call({ input: question });
-
-    res.json({
-      answer: result.output,
-      // you can return raw intermediate steps if needed:
-      intermediateSteps: result.intermediateSteps || "See server console for detailed reasoning",
-    });
-  } catch (err) {
-    console.error("ask-agent error:", err);
-    res.status(500).json({ error: "Agent failed" });
-  }
-});
-
-// Start server
-app.listen(3000, () => {
-  console.log("Agent backend running at http://localhost:3000");
-});
-
-If you run with verbose: true, in your server console you’ll see something like:
-Final Answer: 216
-Final Answer: Refunds must be requested within 30 days, per policy.
-	•	Agents don’t just answer → they run a loop of Reason → Act → Observe → Repeat.
-	•	With verbose: true, you can see their reasoning in real time.
-	•	You can return intermediateSteps in your API if you want the frontend to also display the reasoning trace.
 
 ⸻
 
-	•	Memory = how the LLM keeps track of past interactions.
-	•	Without memory:
-	•	With memory:
+- **Memory** = how the LLM keeps track of past interactions.
+- **Without memory:** Each query is stateless; the bot forgets previous messages.
+- **With memory:** The bot can reference earlier conversation, enabling context-aware responses.
 
 ⸻
 
-🔑 Types of Memory
-	1.	BufferMemory
-	•	Stores full chat history (all messages).
-	•	Best for small conversations.
-	•	Problem: grows quickly → token cost.
-	2.	SummaryMemory
-	•	Summarizes older messages into a shorter context.
-	•	Best for longer conversations.
-	•	Keeps memory affordable.
-	3.	VectorStoreRetrieverMemory
-	•	Embeds past conversations into a vector DB.
-	•	Lets the bot retrieve relevant parts of history instead of keeping all.
-	•	Best for long-term memory.
+## 🔑 Types of Memory
+
+1. **BufferMemory**
+  - Stores full chat history (all messages).
+  - Best for short conversations and prototyping.
+  - **Drawback:** Grows quickly, increasing token cost.
+
+2. **SummaryMemory**
+  - Summarizes older messages into a concise context using an LLM.
+  - Best for longer conversations.
+  - **Advantage:** Keeps memory affordable by reducing token usage.
+
+3. **VectorStoreRetrieverMemory**
+  - Embeds past conversations into a vector database (e.g., pgvector).
+  - Bot retrieves only relevant history chunks.
+  - Best for long-term, scalable memory.
 
 ⸻
 
-🖥️ Example: Agent with BufferMemory
+## 🖥️ Example: Agent with BufferMemory
+
+```js
 // Agent with BufferMemory (LangChain JS)
 // ===========================================
 //
@@ -3664,7 +3046,14 @@ const executor = await initializeAgentExecutorWithOptions(tools, llm, {
 
 // Conversation
 await executor.call({ input: "My name is Alex." });
+```
 
+## 🖥️ Example: Agent with SummaryMemory
+
+```js
+import { ConversationSummaryMemory } from "langchain/memory";
+
+// Memory that summarizes older messages
 const memory = new ConversationSummaryMemory({
   llm,                      // uses LLM to auto-summarize
   memoryKey: "chat_history",
@@ -3676,54 +3065,67 @@ const executor = await initializeAgentExecutorWithOptions(tools, llm, {
   memory,
   verbose: true,
 });
+```
 
-This is like giving your bot a “long-term memory database”:
+## 🖥️ Example: Agent with VectorStoreRetrieverMemory
+
+```js
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
+import { VectorStoreRetrieverMemory } from "langchain/memory";
 
-// Vector store
+// Vector store setup
 const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
 const store = await PGVectorStore.initialize(embeddings, {
   pool,
   tableName: "memory",
   columns: {
-    idColumnName: "id",
-    contentColumnName: "content",
-    vectorColumnName: "embedding",
+   idColumnName: "id",
+   contentColumnName: "content",
+   vectorColumnName: "embedding",
   },
 });
 
+// Memory that retrieves relevant history chunks
 const memory = new VectorStoreRetrieverMemory({
   retriever: store.asRetriever(3),
   memoryKey: "chat_history",
 });
+```
 
 ⸻
 
-	•	BufferMemory → short chats, testing.
-	•	SummaryMemory → medium chats, cost-aware.
-	•	VectorStoreMemory → long-term, production bots.
+- **BufferMemory:** Use for short chats and testing.
+- **SummaryMemory:** Use for medium-length chats, cost-aware.
+- **VectorStoreMemory:** Use for long-term, production bots.
 
 ⸻
 
-	•	We’ve now covered Chains → Agents → Memory.
-	•	The natural next step is to move into Agentic AI proper:
-	•	Multi-agent systems (agents talking to each other).
-	•	Planning & coordination.
-	•	Example: “Researcher Agent + Summarizer Agent + Writer Agent” working together.
+We’ve now covered **Chains → Agents → Memory**.
 
-Here’s how you can update your existing Agent backend that uses both the pdf_search tool and the calculator tool.
-// RAG Agent Backend with BufferMemory
-// ==================================================
-//
-// Features:
-//  - Uses retriever tool (pgvector) + calculator tool
-//  - Remembers conversation history (BufferMemory)
-//  - /ask-agent endpoint: now context-aware
-//
-// npm install @langchain/openai @langchain/community langchain express dotenv pg
+**Next step: Agentic AI proper—**
+- Multi-agent systems (agents collaborating)
+- Planning & coordination
+- Example: “Researcher Agent + Summarizer Agent + Writer Agent” working together
+
+---
+
+Here’s how you can update your existing Agent backend that uses both the `pdf_search` tool and the `calculator` tool:
+
+### RAG Agent Backend with BufferMemory
+---
+**Features:**
+- Uses retriever tool (pgvector) + calculator tool
+- Remembers conversation history (BufferMemory)
+- `/ask-agent` endpoint: now context-aware
+
+**Install dependencies:**
+```bash
+npm install @langchain/openai @langchain/community langchain express dotenv pg
+```
 // ==================================================
 
+```js
 import express from "express";
 import "dotenv/config";
 import pkg from "pg";
@@ -3807,3 +3209,4 @@ app.post("/ask-agent", async (req, res) => {
 app.listen(3000, () => {
   console.log("RAG Agent with Memory running at http://localhost:3000");
 });
+```
